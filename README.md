@@ -9,7 +9,7 @@ Create the API containing endpoints:
 3. List of owned Carbon certificates (*owned by current user*)
 4. Transfer my own Carbon certificate to the another existing user (*based on the User ID parameter*)
 
-##### Data informations
+##### Data information
 **Carbon certificate** should contain the following data:
 - Unique ID
 - Country
@@ -27,3 +27,39 @@ Create the API containing endpoints:
 - Tests have to be included
 
 ### Good luck!
+
+## Solution
+[NestJS](https://nestjs.com/) framework was used for this solution. 
+
+## Installation
+
+```bash
+$ npm install
+```
+
+## Running the app
+
+```bash
+# development
+$ npm run start
+
+# watch mode
+$ npm run start:dev
+
+# production mode
+$ npm run start:prod
+```
+
+## Test
+
+```bash
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
+```
+
