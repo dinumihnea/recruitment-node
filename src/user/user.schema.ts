@@ -5,8 +5,11 @@ import { Document } from 'mongoose';
 export class User extends Document {
   _id: string;
 
-  @Prop({ required: true })
-  givenName: string;
+  /**
+   * Flag indicating if user is authorized to access the API
+   */
+  @Prop({ required: true, type: Boolean })
+  isActive: boolean;
 
   @Prop({ required: false, select: false })
   password: string;
@@ -16,3 +19,4 @@ export class User extends Document {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+export type UserType = Omit<User, 'password'>;

@@ -2,17 +2,19 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Certificate } from './certificate.schema';
+import { UserType } from '../user/user.schema';
 
 @Injectable()
 export class CertificateService {
   constructor(
-    @InjectModel(Certificate.name) private certificateModel: Model<Certificate>,) {
-  }
+    @InjectModel(Certificate.name) private certificateModel: Model<Certificate>,
+  ) {}
 
-
-  async transferCertificate(id: string, newOwner: string): Promise<void> {
-
-  }
+  async transferCertificate(
+    id: string,
+    newOwner: string,
+    currentUser: UserType,
+  ): Promise<void> {}
 
   private async getCertificateById(id: string): Promise<Certificate> {
     return this.certificateModel.findById(id);
@@ -20,7 +22,9 @@ export class CertificateService {
 
   private validateTransfer(certificate: Certificate, newOwner: string): void {
     if (certificate.owner.toString() === newOwner) {
-      throw new BadRequestException('New certificate owner must be different than existing owner');
+      throw new BadRequestException(
+        'New certificate owner must be different than existing owner',
+      );
     }
   }
 }
