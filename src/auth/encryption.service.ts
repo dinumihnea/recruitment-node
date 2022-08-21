@@ -1,18 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { CONFIG_KEYS } from '../common/config-keys';
 
 @Injectable()
 export class EncryptionService {
-  constructor(private readonly configService: ConfigService) {}
-
   /**
    * Hashes password based on [Blowfish]{@link https://en.wikipedia.org/wiki/Blowfish} algorithm
    * @param password text to be hashed
+   * @param rounds nr of rounds to encrypt the string
    */
-  async encrypt(password: string): Promise<string> {
-    const salt = await this.generateSalt();
+  async encrypt(password: string, rounds: number): Promise<string> {
+    const salt = await this.generateSalt(rounds);
     return await bcrypt.hash(password, salt);
   }
 
@@ -25,11 +22,7 @@ export class EncryptionService {
     return await bcrypt.compare(password, encrypted);
   }
 
-  private async generateSalt(): Promise<string> {
-    const rounds = Number(
-      this.configService.get(CONFIG_KEYS.PASSWORD_HASH_SALT_ROUNDS),
-    );
-
+  async generateSalt(rounds: number): Promise<string> {
     return await bcrypt.genSalt(rounds);
   }
 }

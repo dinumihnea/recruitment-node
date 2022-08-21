@@ -2,6 +2,8 @@ import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
 import { UserWithPasswordType } from '../src/user/user.schema';
 import { EncryptionService } from '../src/auth/encryption.service';
+import { ConfigService } from '@nestjs/config';
+import { CONFIG_KEYS } from '../src/common/config-keys';
 
 /**
  * Generates random fake users
@@ -9,7 +11,10 @@ import { EncryptionService } from '../src/auth/encryption.service';
  */
 @Injectable()
 export class UserGenerator {
-  constructor(private readonly encryptionService: EncryptionService) {}
+  constructor(
+    private readonly encryptionService: EncryptionService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async generateRandomUsers(
     count: number,
@@ -20,7 +25,9 @@ export class UserGenerator {
         const username = faker.internet.userName();
         const password = await this.encryptionService.encrypt(
           username + '1234',
+          Number(this.configService.get(CONFIG_KEYS.PASSWORD_HASH_SALT_ROUNDS)),
         );
+
         users.push({
           username,
           password,

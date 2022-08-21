@@ -22,7 +22,7 @@ export class CertificateController {
   async transfer(
     @Body() dto: TransferCertificateDto,
     @CurrentUser() currentUser: UserType,
-  ): Promise<void> {
+  ): Promise<boolean> {
     return this.certificateService.transferCertificate(
       dto.id,
       dto.newOwnerId,
