@@ -28,9 +28,8 @@ export class Certificate extends Document {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: User.name,
-    required: true
   })
-  owner: User | mongoose.Types.ObjectId;
+  owner?: User | mongoose.Types.ObjectId;
 
   /**
    * Current certificate status
@@ -50,3 +49,4 @@ export class Certificate extends Document {
 }
 
 export const CertificateSchema = SchemaFactory.createForClass(Certificate);
+export type CertificateType = Partial<Certificate>;

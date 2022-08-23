@@ -19,4 +19,5 @@ export class User extends Document {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-export type UserType = Omit<User, 'password'>;
+export type UserType = Partial<Omit<User, 'password'>>;
+export type UserWithPasswordType = Partial<User>;
