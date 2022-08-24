@@ -4,19 +4,6 @@ import { CertificateStatus } from './certificate-status.enum';
 import { User } from '../user/user.schema';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
-export const MockCertificateModel = {
-  findOne: jest.fn(),
-  updateOne: jest.fn(() =>
-    Promise.resolve({
-      matchedCount: 1,
-      modifiedCount: 1,
-      upsertedCount: 0,
-      upsertedId: undefined,
-      acknowledged: true,
-    }),
-  ),
-} as any;
-
 const MOCK_CERTIFICATE_ID = 'MOCK_CERTIFICATE_ID';
 const MOCK_OWNER_ID = 'MOCK_OWNER_ID';
 
@@ -31,6 +18,24 @@ const MOCK_CERTIFICATE = {
   status: CertificateStatus.OWNED,
   owner: MOCK_USER._id,
 } as Certificate;
+
+export const MockCertificateModel = {
+  find: jest.fn(() => MockCertificateModel),
+  skip: jest.fn(() => MockCertificateModel),
+  limit: jest.fn(() => MockCertificateModel),
+  select: jest.fn(() => MockCertificateModel),
+  exec: jest.fn(() => [MOCK_CERTIFICATE]),
+  findOne: jest.fn(),
+  updateOne: jest.fn(() =>
+    Promise.resolve({
+      matchedCount: 1,
+      modifiedCount: 1,
+      upsertedCount: 0,
+      upsertedId: undefined,
+      acknowledged: true,
+    }),
+  ),
+} as any;
 
 describe('CertificateService', () => {
   let service: CertificateService;
@@ -151,6 +156,84 @@ describe('CertificateService', () => {
       MockCertificateModel.findOne.mockRejectedValueOnce(error);
       await expect(
         service.getCertificateByIdAndOwner(MOCK_CERTIFICATE_ID, MOCK_OWNER_ID),
+      ).rejects.toBe(error);
+    });
+  });
+
+  describe('listAvailableCertificates', () => {
+    const SKIP_MOCK = 0,
+      LIMIT_MOCK = 10;
+    it('should call the find and match the status as AVAILABLE', async () => {
+      await service.listAvailableCertificates(LIMIT_MOCK, SKIP_MOCK);
+      expect(MockCertificateModel.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: CertificateStatus.AVAILABLE,
+        }),
+      );
+    });
+
+    it('should call the find and match the expected pagination params', async () => {
+      await service.listAvailableCertificates(LIMIT_MOCK, SKIP_MOCK);
+      expect(MockCertificateModel.skip).toHaveBeenCalledWith(SKIP_MOCK);
+      expect(MockCertificateModel.limit).toHaveBeenCalledWith(LIMIT_MOCK);
+    });
+
+    it('should call the find and match the expected projection args', async () => {
+      const expectedArg = '_id country status';
+      await service.listAvailableCertificates(LIMIT_MOCK, SKIP_MOCK);
+      expect(MockCertificateModel.select).toHaveBeenCalledWith(expectedArg);
+    });
+
+    it('should throw when exec throws an error', async () => {
+      const error = new Error();
+      MockCertificateModel.exec.mockRejectedValueOnce(error);
+      await expect(
+        service.listAvailableCertificates(LIMIT_MOCK, SKIP_MOCK),
+      ).rejects.toBe(error);
+    });
+  });
+
+  describe('listCertificatesByOwner', () => {
+    const SKIP_MOCK = 0,
+      LIMIT_MOCK = 10;
+    it('should call the find and match the ownerId', async () => {
+      await service.listCertificatesByOwner(
+        MOCK_OWNER_ID,
+        LIMIT_MOCK,
+        SKIP_MOCK,
+      );
+      expect(MockCertificateModel.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          owner: MOCK_OWNER_ID,
+        }),
+      );
+    });
+
+    it('should call the find and match the expected pagination params', async () => {
+      await service.listCertificatesByOwner(
+        MOCK_OWNER_ID,
+        LIMIT_MOCK,
+        SKIP_MOCK,
+      );
+      expect(MockCertificateModel.skip).toHaveBeenCalledWith(SKIP_MOCK);
+      expect(MockCertificateModel.limit).toHaveBeenCalledWith(LIMIT_MOCK);
+    });
+
+    it('should call the find and match the expected projection args', async () => {
+      const expectedArg = '_id country status owner';
+      await service.listCertificatesByOwner(
+        MOCK_OWNER_ID,
+        LIMIT_MOCK,
+        SKIP_MOCK,
+      );
+      expect(MockCertificateModel.select).toHaveBeenCalledWith(expectedArg);
+    });
+
+    it('should throw when exec throws an error', async () => {
+      const error = new Error();
+      MockCertificateModel.exec.mockRejectedValueOnce(error);
+      await expect(
+        service.listCertificatesByOwner(MOCK_OWNER_ID, LIMIT_MOCK, SKIP_MOCK),
       ).rejects.toBe(error);
     });
   });

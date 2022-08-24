@@ -8,6 +8,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Certificate } from './certificate.schema';
 import { UserType } from '../user/user.schema';
 import { CertificateStatus } from './certificate-status.enum';
+import { AvailableCertificateResponseDto } from './dto/available-certificate-response.dto';
+import { MyCertificateResponseDto } from './dto/my-certificate-response.dto';
 
 @Injectable()
 export class CertificateService {
@@ -52,6 +54,34 @@ export class CertificateService {
     return Boolean(updateResult.modifiedCount);
   }
 
+  async listAvailableCertificates(
+    limit: number,
+    skip: number,
+  ): Promise<Array<AvailableCertificateResponseDto>> {
+    return this.certificateModel
+      .find<AvailableCertificateResponseDto>({
+        status: CertificateStatus.AVAILABLE,
+      })
+      .skip(skip)
+      .limit(limit)
+      .select('_id country status')
+      .exec();
+  }
+
+  async listCertificatesByOwner(
+    ownerId: string,
+    limit: number,
+    skip: number,
+  ): Promise<Array<MyCertificateResponseDto>> {
+    return await this.certificateModel
+      .find<MyCertificateResponseDto>({
+        owner: ownerId,
+      })
+      .skip(skip)
+      .limit(limit)
+      .select('_id country status owner')
+      .exec();
+  }
   private validateTransfer(certificate: Certificate, newOwnerId: string): void {
     if (certificate.status !== CertificateStatus.OWNED) {
       throw new BadRequestException('Certificate cannot be transferred');

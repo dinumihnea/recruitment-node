@@ -12,7 +12,7 @@ const DEFAULT_TESTING_CERTIFICATES = [
   },
   {
     _id: '63065e8958ab3e1109ab093e',
-    status: CertificateStatus.AVAILABLE,
+    status: CertificateStatus.TRANSFERRED,
     country: 'Denmark',
     owner: DEFAULT_TESTING_USER._id,
   },
