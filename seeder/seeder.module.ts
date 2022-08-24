@@ -79,9 +79,11 @@ export class SeederModule implements OnModuleInit, OnModuleDestroy {
   async generateRandomSeeds(): Promise<void> {
     const certificates = await generateRandomCertificates(100);
     await createSeed<CertificateType>('certificates', certificates);
+    console.log('Certificate random seeds successfully generated!');
 
     const users = await this.userGenerator.generateRandomUsers(10);
     await createSeed<UserType>('users', users);
+    console.log('User random seeds successfully generated!');
   }
 
   async applySeeders(): Promise<void> {
@@ -95,7 +97,7 @@ export class SeederModule implements OnModuleInit, OnModuleDestroy {
     if (!certificateSeedExists) {
       await this.certificateModel.insertMany(certificateSeeds.certificates);
       await this.seederService.create(certificateSeeds.seederKey);
-      console.log('Certificate seeds successfully stored');
+      console.log('Certificate seeds successfully applied!');
     }
 
     const userSeeds = await this.seederService.getSeeds<{
@@ -106,7 +108,7 @@ export class SeederModule implements OnModuleInit, OnModuleDestroy {
     if (!userSeedExists) {
       await this.userModel.insertMany(userSeeds.users);
       await this.seederService.create(userSeeds.seederKey);
-      console.log('User seeds successfully stored');
+      console.log('User seeds successfully applied!');
     }
   }
 
