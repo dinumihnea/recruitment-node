@@ -1,0 +1,7 @@
+services:
+  mongo:
+    image: mongo:4.4.11
+    restart: always
+    container_name: agreena
+    ports:
+      - '27017:27017'
